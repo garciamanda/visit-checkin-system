@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(RECEPCAO)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  visits Visitor[]
+
+  @@map("users")
+}
+
+model Visitor {
+  id           Int         @id @default(autoincrement())
+  name         String
+  document     String
+  documentType String
+  phone        String?
+  relationship String
+  patientName  String
+  checkIn      DateTime?
+  checkOut     DateTime?
+  status       VisitStatus @default(ACTIVE)
+  userId       Int
+  notes        String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("visitors")
+}
+
+enum UserRole {
+  ADMIN
+  RECEPCAO
+}
+
+enum VisitStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
